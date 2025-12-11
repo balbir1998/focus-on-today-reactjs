@@ -2,9 +2,10 @@ import GoalContainer from './GoalContainer';
 import ProgressBar from './ProgressBar';
 import Header from './Header';
 import { useEffect, useState } from 'react';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 const Main = () => {
-    const [allGoals, setAllGoals] = useState({
+    const [allGoals, setAllGoals] = useLocalStorage("allGoals", {
         first: {
             name: "",
             isCompleted: false
@@ -19,13 +20,15 @@ const Main = () => {
         }
     });
 
-    const [allInputs, setAllInputs] = useState({
+    const [allInputs, setAllInputs] = useLocalStorage("allInputs", {
         first: "",
         second: "",
         third: ""
     });
 
+    const [initialMount, setInitialMount] = useState(true);
     const [error, setError] = useState(false);
+
     const isAllInputsFilled = Object.values(allInputs).every(input => input);
     const completedGoalsCount = Object.values(allGoals).filter(goal => goal.isCompleted).length;
 
@@ -62,7 +65,13 @@ const Main = () => {
         }
     }
 
+
     useEffect(() => {
+        if (initialMount) {
+            setInitialMount(false)
+            return;
+        }
+
         if (!isAllInputsFilled) {
             setAllGoals(prevState => {
                 const allGoals = { ...prevState };
